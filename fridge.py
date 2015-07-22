@@ -24,23 +24,17 @@ class Fridge(object):
             print cufs[0].encode('utf-8')
         except IndexError:
             pass
-    def loop_pages(self):
-        page = 1
-        page_url = self.main_url
-        while True:
-            response = requests.get(page_url)
-            tree = html.fromstring(response.text)
-            pathX = ('//div[@class="inner"]/div[@class="article-image"]'
-                     '/a[@class="darken"]/@href')
-            links = tree.xpath(pathX)
-            self.links.extend(links)
-            if page == 74:
-                break
-            page += 1
-            page_url = '{}/page/{}/'.format(self.main_url, page)
-        with open('links.txt', 'w') as f:
-            for link in self.links:
-                f.write('{}\n'.format(link))
-    def loop_links(self):
-        for link in self.links:
+
+    def get_page_data(self, page_num):
+        if page_num == 1:
+            page = ''
+        else:
+            page = '/page/{}/'.format(page_num)
+        page_url = '{}{}'.format(self.main_url, page)
+        response = requests.get(page_url)
+        tree = html.fromstring(response.text)
+        pathX = ('//div[@class="inner"]/div[@class="article-image"]'
+                    '/a[@class="darken"]/@href')
+        links = tree.xpath(pathX)
+        for link in links:
             self.get_single_title(link)
